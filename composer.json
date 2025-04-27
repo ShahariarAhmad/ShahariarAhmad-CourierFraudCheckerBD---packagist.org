@@ -1,0 +1,54 @@
+{
+    "name": "shahariar-ahmad/courier-fraud-checker-bd",
+    "description": "A fraud detection tool for e-commerce platforms to analyze customer order behavior across Steadfast and Pathao couriers.",
+    "type": "library",
+    "license": "GPL-3.0",
+    "keywords": [
+        "fraud detection",
+        "e-commerce",
+        "order tracking",
+        "courier",
+        "delivery",
+        "customer behavior",
+        "fraud checker",
+        "pathao",
+        "steadfast courier",
+        "shipping",
+        "order management",
+        "fraud prevention",
+        "order cancellation",
+        "Laravel package",
+        "e-commerce fraud",
+        "order status",
+        "API integration",
+        "order verification",
+        "Laravel fraud checker",
+        "delivery tracking"
+    ],
+    "autoload": {
+        "psr-4": {
+            "ShahariarAhmad\\CourierFraudCheckerBd\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ShahariarAhmad\\CourierFraudCheckerBd\\CourierFraudCheckerBdServiceProvider"
+            ],
+            "aliases": {
+                "CourierFraudCheckerBd": "ShahariarAhmad\\CourierFraudCheckerBd\\Facade\\CourierFraudCheckerBdFacade"
+            }
+        }
+    },
+    "authors": [
+        {
+            "name": "Shahariar Ahmad",
+            "email": "muhd.shahariar@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.1",
+        "illuminate/http": "^11.0 || ^12.0 || ^13.0"
+    }
+}
