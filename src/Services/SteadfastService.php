@@ -63,11 +63,17 @@ class SteadfastService
             return null;
         }
 
-        $steadfast = [
-            'success' => $object[0],
-            'cancel' =>  $object[1],
-            'total' => $object[0] + $object[1],
+           $steadfast = [
+            'success' => $object['total_delivered'],
+            'cancel' =>  $object['total_cancelled'],
+            'total' => $object['total_delivered'] + $object['total_cancelled'],
         ];
+        
+        // $steadfast = [
+        //     'success' => $object[0],
+        //     'cancel' =>  $object[1],
+        //     'total' => $object[0] + $object[1],
+        // ];
 
         $logoutGET = Http::withCookies($loginCookiesArray, 'steadfast.com.bd')
             ->get('https://steadfast.com.bd/user/frauds/check');
