@@ -5,7 +5,7 @@ namespace ShahariarAhmad\CourierFraudCheckerBd;
 use Illuminate\Support\ServiceProvider;
 use ShahariarAhmad\CourierFraudCheckerBd\Services\SteadfastService;
 use ShahariarAhmad\CourierFraudCheckerBd\Services\PathaoService;
-use ShahariarAhmad\CourierFraudCheckerBd\Facade\CourierFraudCheckerBdFacade;
+use ShahariarAhmad\CourierFraudCheckerBd\Services\RedxService;
 
 class CourierFraudCheckerBdServiceProvider extends ServiceProvider
 {
@@ -26,40 +26,35 @@ class CourierFraudCheckerBdServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // Register the services
-        $this->app->singleton(SteadfastService::class, function ($app) {
-            return new SteadfastService();
-        });
+      // In register() -> singleton
 
-        $this->app->singleton(PathaoService::class, function ($app) {
-            return new PathaoService();
-        });
+$this->app->singleton('courier-fraud-checker-bd', function ($app) {
+    return new class($app) {
+        protected $steadfastService;
+        protected $pathaoService;
+        protected $redxService;
 
-        // Register the main service as a single object to handle both services
-        $this->app->singleton('courier-fraud-checker-bd', function ($app) {
-            return new class($app) {
-                protected $steadfastService;
-                protected $pathaoService;
+        public function __construct($app)
+        {
+            $this->steadfastService = $app->make(SteadfastService::class);
+            $this->pathaoService = $app->make(PathaoService::class);
+            $this->redxService = $app->make(RedxService::class);
+        }
 
-                public function __construct($app)
-                {
-                    $this->steadfastService = $app->make(SteadfastService::class);
-                    $this->pathaoService = $app->make(PathaoService::class);
-                }
+        public function check($phoneNumber)
+        {
+            $steadfastResult = $this->steadfastService->steadfast($phoneNumber);
+            $pathaoResult = $this->pathaoService->pathao($phoneNumber);
+            $redxResult = $this->redxService->getCustomerDeliveryStats($phoneNumber);
 
-                public function check($phoneNumber)
-                {
-                    // You can switch between which service to use based on your logic
-                    $steadfastResult = $this->steadfastService->steadfast($phoneNumber);
-                    $pathaoResult = $this->pathaoService->pathao($phoneNumber);
+            return [
+                'steadfast' => $steadfastResult,
+                'pathao' => $pathaoResult,
+                'redx' => $redxResult,
+            ];
+        }
+    };
+});
 
-                    // Combine or return whichever result you need
-                    return [
-                        'steadfast' => $steadfastResult,
-                        'pathao' => $pathaoResult
-                    ];
-                }
-            };
-        });
     }
 }
