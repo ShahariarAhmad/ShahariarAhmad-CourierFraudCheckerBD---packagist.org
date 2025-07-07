@@ -9,52 +9,42 @@ use ShahariarAhmad\CourierFraudCheckerBd\Services\RedxService;
 
 class CourierFraudCheckerBdServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap any package services.
-     *
-     * @return void
-     */
     public function boot()
     {
-        // You can publish config files or views here if necessary
+        // Publish the config file on vendor:publish
+        $this->publishes([
+            __DIR__ . '/../config/courier-fraud-checker-bd.php' => config_path('courier-fraud-checker-bd.php'),
+        ], 'config');
     }
 
-    /**
-     * Register any package services.
-     *
-     * @return void
-     */
     public function register()
     {
-      // In register() -> singleton
+        $this->mergeConfigFrom(
+            __DIR__ . '/../config/courier-fraud-checker-bd.php', 'courier-fraud-checker-bd'
+        );
 
-$this->app->singleton('courier-fraud-checker-bd', function ($app) {
-    return new class($app) {
-        protected $steadfastService;
-        protected $pathaoService;
-        protected $redxService;
+        $this->app->singleton('courier-fraud-checker-bd', function ($app) {
+            return new class($app) {
+                protected $steadfastService;
+                protected $pathaoService;
+                protected $redxService;
 
-        public function __construct($app)
-        {
-            $this->steadfastService = $app->make(SteadfastService::class);
-            $this->pathaoService = $app->make(PathaoService::class);
-            $this->redxService = $app->make(RedxService::class);
-        }
+                public function __construct($app)
+                {
+                    $this->steadfastService = $app->make(SteadfastService::class);
+                    $this->pathaoService = $app->make(PathaoService::class);
+                    $this->redxService = $app->make(RedxService::class);
+                }
 
-        public function check($phoneNumber)
-        {
-            $steadfastResult = $this->steadfastService->steadfast($phoneNumber);
-            $pathaoResult = $this->pathaoService->pathao($phoneNumber);
-            $redxResult = $this->redxService->getCustomerDeliveryStats($phoneNumber);
-
-            return [
-                'steadfast' => $steadfastResult,
-                'pathao' => $pathaoResult,
-                'redx' => $redxResult,
-            ];
-        }
-    };
-});
-
+                public function check($phoneNumber)
+                {
+                    return [
+                        'steadfast' => $this->steadfastService->steadfast($phoneNumber),
+                        'pathao' => $this->pathaoService->pathao($phoneNumber),
+                        'redx' => $this->redxService->getCustomerDeliveryStats($phoneNumber),
+                    ];
+                }
+            };
+        });
     }
 }

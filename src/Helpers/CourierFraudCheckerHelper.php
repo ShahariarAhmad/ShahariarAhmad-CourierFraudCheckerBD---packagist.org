@@ -28,24 +28,35 @@ class CourierFraudCheckerHelper
      * @param string $phoneNumber
      * @throws InvalidArgumentException
      */
-  // Validate if the phone number is a valid Bangladeshi phone number
-  public static function validatePhoneNumber($phoneNumber)
-{
-    $validator = Validator::make(
-        ['phone' => $phoneNumber],
-        [
-            'phone' => [
-                'required',
-                'regex:/^01[3-9][0-9]{8}$/'
+    // Validate if the phone number is a valid Bangladeshi phone number
+    public static function validatePhoneNumber($phoneNumber)
+    {
+        $validator = Validator::make(
+            ['phone' => $phoneNumber],
+            [
+                'phone' => [
+                    'required',
+                    'regex:/^01[3-9][0-9]{8}$/'
+                ]
+            ],
+            [
+                'phone.regex' => 'Invalid Bangladeshi phone number. Remember, you do not need to include the +88 prefix. Only use the local format (e.g., 01712345678).'
             ]
-        ],
-        [
-            'phone.regex' => 'Invalid Bangladeshi phone number. Remember, you do not need to include the +88 prefix. Only use the local format (e.g., 01712345678).'
-        ]
-    );
+        );
 
-    if ($validator->fails()) {
-        throw new InvalidArgumentException($validator->errors()->first('phone'));
+        if ($validator->fails()) {
+            throw new InvalidArgumentException($validator->errors()->first('phone'));
+        }
     }
-}
+
+
+    // CourierFraudCheckerHelper.php
+    public static function checkRequiredConfig(array $requiredKeys)
+    {
+        foreach ($requiredKeys as $key) {
+            if (empty(config($key))) {
+                throw new InvalidArgumentException("The config key {$key} is required but not set.");
+            }
+        }
+    }
 }
